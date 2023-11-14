@@ -1,0 +1,63 @@
+\documentclass{scrartcl}
+\usepackage[UKenglish]{babel}
+\usepackage{graphicx}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{microtype}
+\usepackage[inkscapeformat=eps, inkscapepath=svgdir]{svg}
+
+\usepackage{hyperref}
+
+\usepackage{cleveref}
+
+\title{Advanced Data Analysis and Machine Learning - Practical Activities}
+\subtitle{Sequential Data}
+\author{Sergio Mauricio Vanegas Arias}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+  This week, we were asked to experiment with Recursive Neural Network architectures. Particularly, we were told to choose a type of dataset (``Time-Series forecasting'' in the case of this report) and compare the performance of the ML architectures with that of an Auto-Regressive (AR) model.
+
+  The specific tasks are the following:
+
+  \begin{enumerate}
+    \item Import, pre-process, and visualize the dataset.
+    \item Fit and compare:
+    \begin{itemize}
+      \item A baseline autoregressive model;
+      \item A traditional RNN;
+      \item An LSTM.
+    \end{itemize}
+    \item Interpret and comment on the results of each modelling strategy.
+  \end{enumerate}
+
+\section{Dataset Pre-Processing and Visualization}
+
+  The chosen dataset was \href{https://www.kaggle.com/datasets/chaitanyakumar12/time-series-forecasting-of-solar-energy/}{\emph{Time series forecasting of solar energy}}, where the target variable is \emph{solar\_mw}. Before going any further, it is worth mentioning that the dataset contains a typo in row 2184 of the \emph{wind-direction} variable, where the authors inserted the text-string ``am'' instead of a numerical value. This instance was removed by hand and later interpolated.
+
+  Out of the box, without dropping bad entries or performing any kind of interpolation, the dataset was as in \Cref{fig:timeseries_raw}. It is easy to notice that only the last fraction of the dataset contains any data beyond the target variable, so we drop all observations containing any missing value.
+
+  \begin{figure}
+    \centering
+    \includesvg[width=0.8\textwidth]{figures/timeseries_raw.svg}
+    \caption{Raw dataset}
+    \label{fig:timeseries_raw}
+  \end{figure}
+
+  The result of this operation and interpolating linearly for any missing value within the remainder of the dataset is shown in \Cref{fig:timeseries_clean}. In this state, it is easy to visualize the periodicity and non-stationary character of the target variable, which merits the fitting of an ARIMAX model.
+
+  \begin{figure}
+    \centering
+    \includesvg[width=0.8\textwidth]{figures/timeseries_clean.svg}
+    \caption{Clean dataset}
+    \label{fig:timeseries_clean}
+  \end{figure}
+
+\end{document}
