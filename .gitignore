@@ -16,6 +16,7 @@
 *.dvi
 *.xdv
 *-converted-to.*
+*svg-tex.eps*
 # these rules might exclude image files for figures etc.
 # *.ps
 # *.eps
