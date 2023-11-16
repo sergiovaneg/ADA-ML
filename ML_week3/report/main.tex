@@ -8,6 +8,9 @@
 \usepackage{microtype}
 \usepackage[inkscapeformat=eps, inkscapepath=svgdir]{svg}
 
+\usepackage{amsmath}
+\usepackage{amssymb}
+
 \usepackage{hyperref}
 
 \usepackage{cleveref}
@@ -44,7 +47,7 @@
 
   Out of the box, without dropping bad entries or performing any kind of interpolation, the dataset was as in \Cref{fig:timeseries_raw}. It is easy to notice that only the last fraction of the dataset contains any data beyond the target variable, so we drop all observations containing any missing value.
 
-  \begin{figure}
+  \begin{figure}[ht]
     \centering
     \includesvg[width=0.8\textwidth]{figures/timeseries_raw.svg}
     \caption{Raw dataset}
@@ -53,11 +56,60 @@
 
   The result of this operation and interpolating linearly for any missing value within the remainder of the dataset is shown in \Cref{fig:timeseries_clean}. In this state, it is easy to visualize the periodicity and non-stationary character of the target variable, which merits the fitting of an ARIMAX model.
 
-  \begin{figure}
+  \begin{figure}[ht]
     \centering
     \includesvg[width=0.8\textwidth]{figures/timeseries_clean.svg}
     \caption{Clean dataset}
     \label{fig:timeseries_clean}
   \end{figure}
+
+  Finally, for the sake of numerical standardization (and since the focus of this report is comparing model accuracy instead of the application itself), we normalize all variables using the \emph{z-score} method. The normalized dataset is shown in \Cref{fig:timeseries_norm}
+
+  \begin{figure}[ht]
+    \centering
+    \includesvg[width=0.8\textwidth]{figures/timeseries_norm.svg}
+    \caption{Normalized dataset}
+    \label{fig:timeseries_norm}
+  \end{figure}
+
+  The initial $70\%$ of the normalized dataset was used for training, whereas the remaining $30\%$ was reserved for validation.
+
+\section{Baseline Model}
+
+  The first fitted model, as mentioned earlier, was an Auto-Regressive Moving-Average with Exogenous input (ARIMAX) model, the order of which was determined by iterating over the orders of the autoregressive, differences, and moving average components ($p$, $d$, and $q$ respectively) and comparing the prediction Root-Mean-Squared Error (RMSE) over the validation signal\footnote{After the grid search was performed, the optimal parameters were fixed in the code to reduce execution time.}. The optimal model ended up being an $ARIMAX(5,0,3)$ model (which is equivalent to an $ARMAX(5,3)$), with a forecast RMSE of $0.805$ and a Maximum Absolute Error (MAE) of $1.847$. The graphical results can be observed in \Cref{fig:baseline_fit}.
+
+  \begin{figure}[ht]
+    \centering
+    \includesvg[width=0.8\textwidth]{figures/baseline_fit.svg}
+    \caption{Baseline model - Forecast}
+    \label{fig:baseline_fit}
+  \end{figure}
+
+  It can be easily observed that, despite the good fit of the training dataset, the model is incapable of generalizing its dynamics to the test region. Thus, a more complex approach is required
+
+\section{Recursive Models}
+
+  The models in this section were created using the \emph{Tensorflow/Keras} framework, which boasts great computational performance while maintaining a relatively simple API.
+
+  For the sake of a fair comparison, we make use of the optimal ARIMAX autoregressive degree $p$ to define the number of recursive layers and the moving-average degree $q$ to define the number of units per layer.
+
+  \subsection{Simple Recursive Neural Network}
+
+    We first try using a traditional recursive architecture, fitting the data to a stateful RNN layer connected to a Linear Regression (Dense) layer. The stateful property of the model means that the output of each observation depends on the internal state of the network after estimating the previous observation, which means that both the training and prediction processes cannot be parallelized.
+
+    The model training yields the results in \Cref{fig:rnn_fit}, with a forecast RMSE of $1.286$ and a MAE of $3.441$. 
+
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=0.8\textwidth]{figures/rnn_fit.svg}
+      \caption{Simple RNN model - Forecast}
+      \label{fig:rnn_fit}
+    \end{figure}
+
+  \subsection*{LSTM Neural Network}
+    
+    A more modern LSTM architecture is now used in place of the traditional RNN, otherwise keeping the same architecture and statefulness.
+
+    The model training yields the results in , with a forecast RMSE of $1.286$ and a MAE of $3.441$.
 
 \end{document}
