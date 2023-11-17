@@ -91,13 +91,13 @@
 
   The models in this section were created using the \emph{Tensorflow/Keras} framework, which boasts great computational performance while maintaining a relatively simple API.
 
-  For the sake of a fair comparison, we make use of the optimal ARIMAX autoregressive degree $p$ to define the number of recursive layers and the moving-average degree $q$ to define the number of units per layer.
+  For the sake of a fair comparison, we make use of the optimal ARIMAX autoregressive degree $p$ to define the number of recursive layers and the moving-average degree $q$ to define the number of units per layer and number of past inputs considered per estimation. We also limit the maximum number of training epochs to $1000$, but keep the coefficients of the model with the lowest MSE.
 
   \subsection{Simple Recursive Neural Network}
 
-    We first try using a traditional recursive architecture, fitting the data to a stateful RNN layer connected to a Linear Regression (Dense) layer. The stateful property of the model means that the output of each observation depends on the internal state of the network after estimating the previous observation, which means that both the training and prediction processes cannot be parallelized.
+    We first try using a traditional recursive architecture, fitting the data to a stateless RNN layer connected to a Linear Regression (Dense) layer. The statelessness of the model means that the output of each observation does not depend on the internal state of the network after estimating the previous output, which means that the training process can be parallelized; nevertheless, we get that at the expense of losing the state information every time we make a new estimation. 
 
-    The model training yields the results in \Cref{fig:rnn_fit}, with a forecast RMSE of $1.286$ and a MAE of $3.441$. 
+    The model training yields the results in \Cref{fig:rnn_fit}, with a forecast RMSE of $1.223$ and a MAE of $3.396$. 
 
     \begin{figure}[ht]
       \centering
@@ -110,6 +110,13 @@
     
     A more modern LSTM architecture is now used in place of the traditional RNN, otherwise keeping the same architecture and statefulness.
 
-    The model training yields the results in , with a forecast RMSE of $1.286$ and a MAE of $3.441$.
+    The model training yields the results in \Cref{fig:lstm_fit}, with a forecast RMSE of $1.195$ and a MAE of $2.968$.
+
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=0.8\textwidth]{figures/lstm_fit.svg}
+      \caption{LSTM model - Forecast}
+      \label{fig:lstm_fit}
+    \end{figure}
 
 \end{document}
