@@ -76,7 +76,7 @@
 
 \section{Baseline Model}
 
-  The first fitted model, as mentioned earlier, was an Auto-Regressive Moving-Average with Exogenous input (ARIMAX) model, the order of which was determined by iterating over the orders of the autoregressive, differences, and moving average components ($p$, $d$, and $q$ respectively) and comparing the prediction Root-Mean-Squared Error (RMSE) over the validation signal\footnote{After the grid search was performed, the optimal parameters were fixed in the code to reduce execution time.}. The optimal model ended up being an $ARIMAX(5,0,3)$ model (which is equivalent to an $ARMAX(5,3)$), with a forecast RMSE of $0.805$ and a Maximum Absolute Error (MAE) of $1.847$. The graphical results can be observed in \Cref{fig:baseline_fit}.
+  The first fitted model, as mentioned earlier, was an Auto-Regressive Moving-Average with Exogenous input (ARIMAX) model, the order of which was determined by iterating over the orders of the autoregressive, differences, and moving average components ($p$, $d$, and $q$ respectively) and comparing the prediction Root-Mean-Squared Error (RMSE) over the validation signal\footnote{After the grid search was performed, the optimal parameters were fixed in the code to reduce execution time.}. The optimal model ended up being an $ARIMAX(5,0,3)$ model (which is equivalent to an $ARMAX(5,3)$), with a forecast RMSE of $0.805$ and a Maximum Absolute Error (Max AE) of $1.847$. The graphical results can be observed in \Cref{fig:baseline_fit}.
 
   \begin{figure}[ht]
     \centering
@@ -91,13 +91,13 @@
 
   The models in this section were created using the \emph{Tensorflow/Keras} framework, which boasts great computational performance while maintaining a relatively simple API.
 
-  For the sake of a fair comparison, we make use of the optimal ARIMAX autoregressive degree $p$ to define the number of recursive layers and the moving-average degree $q$ to define the number of units per layer and number of past inputs considered per estimation. We also limit the maximum number of training epochs to $1000$, but keep the coefficients of the model with the lowest MSE.
+  For the sake of a fair comparison, but also keeping in mind the increased complexity of the recursive architectures, we make use of thrice the optimal ARIMAX autoregressive degree $p$ to define the number of units in the recursive layer and thrice the moving-average degree $q$ to define the number of past inputs considered per estimation. We also limit the maximum number of training epochs to $1000$, but implements an early stop based on the validation ($20\%$ of the training dataset, $100$ epochs of patience) MSE.
 
   \subsection{Simple Recursive Neural Network}
 
     We first try using a traditional recursive architecture, fitting the data to a stateless RNN layer connected to a Linear Regression (Dense) layer. The statelessness of the model means that the output of each observation does not depend on the internal state of the network after estimating the previous output, which means that the training process can be parallelized; nevertheless, we get that at the expense of losing the state information every time we make a new estimation. 
 
-    The model training yields the results in \Cref{fig:rnn_fit}, with a forecast RMSE of $1.223$ and a MAE of $3.396$. 
+    The model training yields the results in \Cref{fig:rnn_fit}, with a forecast RMSE of $1.212$ and a Max AE of $3.168$. Despite the numerically worse performance, we can observe that the forecasted signal trend is better tracked; this is mainly due to the validation split that avoids the overfitting observed for the ARMAX model.
 
     \begin{figure}[ht]
       \centering
@@ -106,11 +106,11 @@
       \label{fig:rnn_fit}
     \end{figure}
 
-  \subsection*{LSTM Neural Network}
+  \subsection{LSTM Neural Network}
     
-    A more modern LSTM architecture is now used in place of the traditional RNN, otherwise keeping the same architecture and statefulness.
+    A more modern LSTM architecture is now used in place of the traditional RNN, otherwise keeping the same architecture and statelessness.
 
-    The model training yields the results in \Cref{fig:lstm_fit}, with a forecast RMSE of $1.195$ and a MAE of $2.968$.
+    The model training yields the results in \Cref{fig:lstm_fit}, with a forecast RMSE of $1.409$ and a MAE of $3.301$. Once again, the numerical drop in performance is due to the validation split.
 
     \begin{figure}[ht]
       \centering
@@ -118,5 +118,18 @@
       \caption{LSTM model - Forecast}
       \label{fig:lstm_fit}
     \end{figure}
+
+\section{Further Discussion}
+
+  In both recursive architecture scenarios, we see an increase in squared error; but when we look at \Cref{fig:baseline_fit}, we see that the relatively low error comes from the model outputting an almost null signal that is, on average, closer to the real value without really trying to recover the dynamics of the solar power production.
+
+  Moreover, using the same number of units and inputs, we can notice that the intrinsically more complex of the LSTM layer with respect to the Simple RNN one makes it perform worse.
+
+  Some strategies tried to improve the model but not fully discussed in the report were:
+  \begin{itemize}
+    \item Using a stateful recursive network, which makes use of the internal state of the recursive layer for every subsequent estimation at the expense of lack of training parallelization.
+    \item Using multiple recursive layers, which resulted in a decreased generalization ability and longer training times.
+    \item Using a larger amount of input lags/recursive units, which only resulted in an early termination after the patience period.
+  \end{itemize}
 
 \end{document}
