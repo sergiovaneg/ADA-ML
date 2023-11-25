@@ -1,0 +1,51 @@
+\documentclass{scrartcl}
+
+\usepackage{graphicx}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{microtype}
+\usepackage[inkscapeformat=eps, inkscapepath=svgdir]{svg}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{biblatex}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\addbibresource{main.bib}
+
+\title{Advanced Data Analysis and Machine Learning - Practical Activities}
+\subtitle{Transformer Architecture}
+\author{Sergio Mauricio Vanegas Arias}
+\date{\today}
+
+\begin{document}
+
+  \maketitle
+
+  \section{Introduction}
+
+    This week, we were asked to experiment with the Transformer architecture\cite{vaswani2023attention} to solve the same modelling task we selected last week for the \emph{Recursive Network Architectures}' assignment, and then compare their performance.
+
+    As a personal note, I realized that I failed to include the predictions made by the recursive architectures in my input signal, which made the performance comparison to the ARIMAX model non-representative of their real capabilities. Therefore, this week I re-trained the models using the fed-back signal of interest as the only input for all the evaluated models. Furthermore, I included an additional metric called "short-term RMSE", which measures the forecast accuracy over the first $48$ hours after the end of the ground-truth or context provided to the model.
+
+    The specific tasks were the following:
+    \begin{itemize}
+      \item Describe the model architecture.
+      \item Set up the Transformer Model training to forecast solar energy production.
+      \item Fine-tune the hyperparameters of the model using a grid search over 4 arbitrary (yet relevant) architectural properties.
+      \item Compare the Transformer model's performance against that of the recursive networks.
+    \end{itemize}
+
+  \section{Architecture Description}
+
+    
+
+  \section*{References}
+
+    \printbibliography
+
+\end{document}
