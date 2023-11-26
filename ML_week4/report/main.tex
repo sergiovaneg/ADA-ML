@@ -42,10 +42,53 @@
 
   \section{Architecture Description}
 
-    
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=\textwidth]{./diagrams/transformer.svg}
+      \caption{Transformer architecture adapted to time-series}
+      \label{fig:transformer}
+    \end{figure}
 
-  \section*{References}
+    In \Cref{fig:transformer}\footnote{The colour-delineated blocks in the diagram are the ones whose hyperparameters where tuned through the grid search, with blocks of the same colour sharing parameters for a single configuration.}, the implemented architecture is shown. The main differences with respect to the original Transformer architecture are the lack of embedding (since the input vector already corresponds to numerical data instead of tokenized text) and the efficient implementation of the feed-forward network in the Encoder/Decoder subnetworks using a 1D Convolutional Layer with kernel size $1$.
 
-    \printbibliography
+    The context and input are of the shape $N_B \times L \times 1$, where $N_B$ is the batch size and $N_L$ is the length of the memory. This is then encoded into the shape \textit{Batch size} $N_B \times N_L \times N_d$, where $N_d$ is the depth of the model, also used for the size of each head in the Multi-Head-Attention (MHA) layers. The MHA layers, in turn have a number $N_H$ of independent heads.
+
+    In the feed-forward 1D convolution layers, the traditional Dense Layer is replaced by a domain-specific convolutional layer with $N_{FF}$ operating on the output of the attention blocks. Finally, The output of the decoder is reduced to the original dimensionality of the input as recommended in \url{https://keras.io/examples/timeseries/timeseries_transformer_classification/}, and then passed through a Single-Layer Perceptron (SLP) of dimension $N_{SLP}$, the output of which is sent to a linear activation layer to recover the time-series prediction.
+
+    The training is done in parallel by passing the same entries as both context and input, whereas the forecast is done by freezing the context in the last samples available for training and recursively updating the input with the predictions made by the model.
+
+  \section{Grid Search}
+
+    In order to optimize the hyperparameters of the Architecture, a grid search is performed over the following parameters and values:
+    \begin{itemize}
+      \item The input/context memory ($L$): $24/48/72$ hours/samples
+      \item The head/encoding dimensionality ($N_d$): $2/4/8$
+      \item The number of attention heads ($N_h$): $2/4/8$
+      \item The number of convolutional filters ($N_{FF}$): $2/5/10$
+      \item The number of SLP units ($N_{SLP}$): $8/16/32$
+    \end{itemize}
+
+    As a result, the optimal configuration was determined by comparing their RMSE; this yielded the following configuration: 
+
+  \section{Model Comparison}
+
+    As mentioned in the introduction, the performance of the optimal Transformer was compared against that of the updated recursive models, which were trained using the same input memory as the fine-tuned network of this week ($x$ samples), and using a number of units equal to $N_h + N_{FF} + N_{SLP}$ from the optimal setup.
+
+    \begin{table}[ht]
+      \centering
+      \begin{tabular}{|l|l|l|l|}
+        \hline
+        Model       & RMSE & Max AE & ST RMSE \\ \hline
+        Transformer &      &        &         \\ \hline
+        RNN         &      &        &         \\ \hline
+        LSTM        &      &        &         \\ \hline
+      \end{tabular}
+      \caption{Model performance comparison}
+      \label{tb:comparison}
+    \end{table}
+
+    As it is evidenced by \Cref{tb:comparison}, the ...
+
+  \printbibliography
 
 \end{document}
