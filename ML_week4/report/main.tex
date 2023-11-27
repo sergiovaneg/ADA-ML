@@ -68,26 +68,55 @@
       \item The number of SLP units ($N_{SLP}$): $8/16/32$
     \end{itemize}
 
-    As a result, the optimal configuration was determined by comparing their RMSE; this yielded the following configuration: 
+    As a result, the optimal configuration was determined by comparing their ST-RMSE; this yielded the following configuration: 
+    \begin{itemize}
+      \item Input/context memory: 48 hours
+      \item Head/encoding dimensionality: 2
+      \item Number of attention heads: 4
+      \item Number of convolutional filters: 10
+      \item Number of SLP units: 16
+    \end{itemize}
+    This set of parameters resulted in a Short-Term RMSE of $0.423$, an RMSE of $1.377$, and a Maximum absolute error of $3.031$. The resulting forecast can be visualized in \Cref{fig:transformer_forecast}.
+
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=\textwidth]{./figures/model_20231126175353_fit.svg}
+      \caption{Optimal Transformer model forecast}
+      \label{fig:transformer_forecast}
+    \end{figure}
 
   \section{Model Comparison}
 
-    As mentioned in the introduction, the performance of the optimal Transformer was compared against that of the updated recursive models, which were trained using the same input memory as the fine-tuned network of this week ($x$ samples), and using a number of units equal to $N_h + N_{FF} + N_{SLP}$ from the optimal setup.
+    As mentioned in the introduction, the performance of the optimal Transformer was compared against that of the updated recursive models, which were trained using the same input memory as the fine-tuned network of this week ($L$ samples), and using a number of units equal to $N_h + N_{FF} + N_{SLP}$ from the optimal setup. The resulting forecasts can be seen in \Cref{fig:rnn_forecast,fig:lstm_forecast} for the RNN and LSTM models respectively.
+
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=\textwidth]{../../ML_week3/report/figures/rnn_fit.svg}
+      \caption{Optimal RNN model forecast}
+      \label{fig:rnn_forecast}
+    \end{figure}
+
+    \begin{figure}[ht]
+      \centering
+      \includesvg[width=\textwidth]{../../ML_week3/report/figures/lstm_fit.svg}
+      \caption{Optimal LSTM model forecast}
+      \label{fig:lstm_forecast}
+    \end{figure}
 
     \begin{table}[ht]
       \centering
-      \begin{tabular}{|l|l|l|l|}
+      \begin{tabular}{|c|c|c|c|}
         \hline
-        Model       & RMSE & Max AE & ST RMSE \\ \hline
-        Transformer &      &        &         \\ \hline
-        RNN         &      &        &         \\ \hline
-        LSTM        &      &        &         \\ \hline
+        \textbf{Model} & \textbf{RMSE} & \textbf{Max AE} & \textbf{ST-RMSE} \\ \hline
+        \textbf{Transformer} & $1.377$ & $3.031$ & $0.423$ \\ \hline
+        \textbf{RNN} & $1.301$ & $3.654$ & $0.844$ \\ \hline
+        \textbf{LSTM} & $1.349$ & $3.079$ & $1.628$ \\ \hline
       \end{tabular}
       \caption{Model performance comparison}
       \label{tb:comparison}
     \end{table}
 
-    As it is evidenced by \Cref{tb:comparison}, the ...
+    As it is evidenced by \Cref{tb:comparison}, the context preservation strategy of the Transformer model positively impacts its short-term forecast capabilities compared to last week's recursive models. In the long-term, however, all models try to preserve an extremely generic shape, failing to model predict the changes in the trend of the weather and sticking its seasonality.
 
   \printbibliography
 

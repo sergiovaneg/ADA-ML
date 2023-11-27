@@ -99,7 +99,7 @@ model_dict = {}
 date_format = "%Y%m%d%H%M%S"
 
 count = 0
-resume = 150
+resume = 0
 
 try:
   for input_memory in [72,48,24]:
