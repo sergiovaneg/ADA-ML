@@ -1,3 +1,4 @@
 {"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QRegarding the data segmentation strategy: modern LLMs\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QOne option would be to set the input size of the model to the length of the longest word in English (pneumonoultramicroscopicsilicovolcanoconiosis, with 45 characters), and then to tokenize individual characters (including whitespaces)\\E$"}
 {"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QThe color-delineated blocks\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_GB","sentence":"^\\QHuman-in-the-Loop Machine Learning: Active learning and annotation for human-centered AI\\E$"}
